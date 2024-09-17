@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="vendor\materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+</head>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-CXPE1MX3HS"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'G-CXPE1MX3HS');
+</script>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        display: flex;
+        /* Center the container horizontally */
+        justify-content: center;
+    }
+
+    .center-column {
+        text-align: center;
+        /* Center elements within the container */
+    }
+
+    #question {
+        font-weight: bold;
+        margin-bottom: 20px;
+        font-size: 30px;
+    }
+
+    #choices {
+        display: flex;
+        flex-wrap: wrap;
+        /* Wrap choices if needed */
+        margin-bottom: 10px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    #choices button {
+        background-color: rgb(220, 217, 217);
+        /* Default button color */
+        color: black;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        /* Indicate clickable cursor */
+        margin: 5px;
+        /* Add space between choices */
+        transition: background-color 0.3s;
+        /* Add smooth color transition on hover */
+    }
+
+    #choices button:hover {
+        background-color: darkgray;
+        /* Button color on hover */
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+        /* Add subtle shadow on hover */
+    }
+
+    #choices button:active {
+        background-color: rgb(133, 133, 133);
+        color: rgb(206, 206, 206);
+    }
+
+    #submit-btn {
+        background-color: black;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: background-color 0.3s;
+    }
+
+    #submit-btn:hover {
+        background-color: rgb(57, 57, 57);
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    #feedback.correct {
+        color: black;
+        /* Default green for correct answer */
+        margin-top: 20px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        font-size: 30px;
+    }
+
+    #feedback.incorrect {
+        color: black;
+        /* Red for incorrect answer */
+        margin: 20px 0;
+        font-weight: bold;
+        margin-bottom: 20px;
+        font-size: 30px;
+    }
+
+    .row {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    #prev-question {
+        background-color: black;
+        color: white;
+        padding: 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: background-color 0.3s;
+    }
+
+    #next-question {
+        background-color: black;
+        color: white;
+        padding: 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: background-color 0.3s;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    table th {
+        background-color: rgb(40, 40, 40);
+        color: white;
+        padding: 10px;
+    }
+
+    table td {
+        border: 1px solid black;
+        padding: 10px;
+    }
+
+    #quiz-container {
+        width: 100%;
+        border: 1px solid rgb(70, 70, 70);
+        padding: 20px;
+        border-radius: 5px;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+
+    }
+
+    .small {
+        font-size: 13px;
+        color: gray;
+
+    }
+
+    input {
+        padding: 10px;
+        margin: 10px;
+        border-radius: 5px;
+        border: 1px solid rgb(70, 70, 70);
+        /*increase check box size*/
+        transform: scale(1.5);
+    }
+
+    .checkbox-container {
+        padding: 10px;
+        margin: 10px;
+        border-radius: 5px;
+        border: 1px solid rgb(70, 70, 70);
+        justify-content: center;
+        text-align: center;
+    }
+
+    .small {
+        font-size: 13px;
+        color: gray;
+    }
+</style>
+
+<script>
+    $(document).ready(function () {
+        var questions1 = [{
+            problem: "What is the source of mitochondrial DNA (mtDNA)?",
+            choices: "Mother/Father/Both parents/Neither parent/It is synthesized de novo",
+            answer: "Mother",
+            select: "",
+            state: false
+        }, {
+            problem: "What is the definition of a gene?",
+            choices: "A segment of DNA that codes for a specific trait/A protein that catalyzes a specific reaction/A type of RNA that carries genetic information/A molecule that provides energy for cellular processes/None of the above",
+            answer: "A segment of DNA that codes for a specific trait",
+            select: "",
+            state: false
+        }, {
+            problem: "What are alleles?",
+            choices: "Different versions of the same gene located at the same locus on homologous chromosomes/Different genes located on the same chromosome/Different chromosomes that carry similar genes/Segments of DNA that do not code for proteins/None of the above",
+            answer: "Different versions of the same gene located at the same locus on homologous chromosomes",
+            select: "",
+            state: false
+        }, {
+            problem: "If an individual has two copies of the same allele for a particular gene, they are said to be:",
+            choices: "Homozygous/Heterozygous/Hemizygous/Dominant/Recessive",
+            answer: "Homozygous",
+            select: "",
+            state: false
+        }, {
+            problem: "If an individual has two different alleles for a particular gene, they are said to be:",
+            choices: "Heterozygous/Homozygous/Hemizygous/Dominant/Recessive",
+            answer: "Heterozygous",
+            select: "",
+            state: false
+        }, {
+            problem: "Which allele will be expressed if an individual is heterozygous for a gene where one allele is dominant and the other is recessive?",
+            choices: "The dominant allele/The recessive allele/Both alleles will be expressed equally/Neither allele will be expressed/It depends on environmental factors",
+            answer: "The dominant allele",
+            select: "",
+            state: false
+        }, {
+            problem: "Give the four core histone proteins that form the octamer in nucleosomes.",
+            choices: "H2A, H2B, H3, and H4/H1, H2A, H2B, and H3/H1, H2, H3, and H4/H1, H2A, H3, and H4/None of the above",
+            answer: "H2A, H2B, H3, and H4",
+            select: "",
+            state: false
+        }, {
+            problem: "What histone protein helps stabilize the DNA wrapped around the histone octamer and is involved in higher-order chromatin structure?",
+            choices: "H1/H2A/H2B/H3/H4",
+            answer: "H1",
+            select: "",
+            state: false
+        }, {
+            problem: "What is a genome?",
+            choices: "The complete set of an organism's genetic material/The protein component of a chromosome/The RNA component of a cell/The non-coding regions of DNA/None of the above",
+            answer: "The complete set of an organism's genetic material",
+            select: "",
+            state: false
+        }, {
+            problem: "Approximately how many DNA base pairs are in the human genome?",
+            choices: "3 Billion/3 Million/3 Trillion/3 Thousand/None of the above",
+            answer: "3 Billion",
+            select: "",
+            state: false
+        }, {
+            problem: "What protein holds sister chromatids together?",
+            choices: "Cohesin/Condensin/Separase/Kinetochore/None of the above",
+            answer: "Cohesin",
+            select: "",
+            state: false
+        }, {
+            problem: "In what phase of the cell cycle do chromosomes condense and become visible?",
+            choices: "Metaphase/Interphase/Prophase/Telophase/None of the above",
+            answer: "Metaphase",
+            select: "",
+            state: false
+        }, {
+            problem: "What form of chromatin is less condensed and generally associated with gene expression?",
+            choices: "Euchromatin/Heterochromatin",
+            answer: "Euchromatin",
+            select: "",
+            state: false
+        }, {
+            problem: "What are the two types of heterochromatin?",
+            choices: "Constitutive heterochromatin and Facultative heterochromatin/Euchromatin and Heterochromatin/Replicative heterochromatin and Transcriptional heterochromatin/None of the above",
+            answer: "Constitutive heterochromatin and Facultative heterochromatin",
+            select: "",
+            state: false
+        }, {
+            problem: "What is an example of facultative heterochromatin in humans?",
+            choices: "The inactive X chromosome (Barr body) in females/The Y chromosome in males/The centromeres of all chromosomes/The telomeres of all chromosomes/None of the above",
+            answer: "The inactive X chromosome (Barr body) in females",
+            select: "",
+            state: false
+        }, {
+            problem: "What is the region on a chromosome where microtubules attach during cell division?",
+            choices: "Centromere/Telomere/Kinetochore/Chromatid/None of the above",
+            answer: "Centromere",
+            select: "",
+            state: false
+        }, {
+            problem: "What protein complex assembles at the centromere, forming the attachment point for microtubules?",
+            choices: "Kinetochore/Cohesin/Condensin/Separase/None of the above",
+            answer: "Kinetochore",
+            select: "",
+            state: false
+        }, {
+            problem: "What type of microtubules are responsible for pulling chromosomes towards opposite poles of the cell during cell division?",
+            choices: "Kinetochore microtubules/Polar microtubules/Astral microtubules/None of the above",
+            answer: "Kinetochore microtubules",
+            select: "",
+            state: false
+        }, {
+            problem: "What are telomeres?",
+            choices: "Repetitive DNA sequences at the ends of chromosomes that protect against degradation and fusion/Genes that code for important proteins/Regions of DNA that regulate gene expression/Sites of DNA replication/None of the above",
+            answer: "Repetitive DNA sequences at the ends of chromosomes that protect against degradation and fusion",
+            select: "",
+            state: false
+        }, {
+            problem: "What enzyme maintains telomere length, preventing them from shortening with each cell division?",
+            choices: "Telomerase/DNA polymerase/RNA polymerase/Ligase/None of the above",
+            answer: "Telomerase",
+            select: "",
+            state: false
+        }, {
+            problem: "Give one method commonly used to obtain a sample for karyotyping.",
+            choices: "Blood sample/Skin biopsy/Hair sample/Saliva sample/Any of the above",
+            answer: "Blood sample",
+            select: "",
+            state: false
+        }, {
+            problem: "What mitogen is commonly used to stimulate cell division in cell culture for karyotyping?",
+            choices: "Phytohemagglutinin (PHA)/Concanavalin A (ConA)/Lipopolysaccharide (LPS)/None of the above",
+            answer: "Phytohemagglutinin (PHA)",
+            select: "",
+            state: false
+        }, {
+            problem: "What drug is used to arrest cells in metaphase for karyotyping by inhibiting microtubule polymerization?",
+            choices: "Colcemid/Taxol/Vinblastine/Nocodazole/Any of the above",
+            answer: "Colcemid",
+            select: "",
+            state: false
+        }, {
+            problem: "What stain is commonly used to visualize chromosomes for karyotyping?",
+            choices: "Giemsa/Hematoxylin and Eosin (H&E)/Silver stain/Periodic acid-Schiff (PAS)/None of the above",
+            answer: "Giemsa",
+            select: "",
+            state: false
+        }, {
+            problem: "What modification, by a specific gene, causes X chromosome inactivation forming the Barr Body?",
+            choices: "Methylation of cytosine bases/Acetylation of histone proteins/Phosphorylation of serine residues/Ubiquitination of lysine residues/None of the above",
+            answer: "Methylation of cytosine bases",
+            select: "",
+            state: false
+        }, {
+            problem: "What is the name of the gene responsible for X chromosome inactivation?",
+            choices: "XIST/SRY/BRCA1/p53/None of the above",
+            answer: "XIST",
+            select: "",
+            state: false
+        }];
+        var questions2 = [{
+            problem: "What is the central dogma of molecular biology?",
+            choices: "DNA ↔ replication -transcription(post)> RNA -translation(post)> Protein/RNA ↔ replication -transcription(post)> DNA -translation(post)> Protein/Protein ↔ replication -transcription(post)> RNA -translation(post)> DNA/None of the above",
+            answer: "DNA ↔ replication -transcription(post)> RNA -translation(post)> Protein",
+            select: "",
+            state: false
+        }, {
+            problem: "What is the name of the specific DNA sequence where DNA replication begins?",
+            choices: "oriC/TATA box/Promoter/Enhancer/None of the above",
+            answer: "oriC",
+            select: "",
+            state: false
+        }, {
+            problem: "What enzyme is responsible for unwinding the DNA double helix during replication?",
+            choices: "Helicase/Gyrase/Primase/DNA Polymerase III/Ligase",
+            answer: "Helicase",
+            select: "",
+            state: false
+        }, {
+            problem: "What is the function of Gyrase (Topoisomerase)?",
+            choices: "Relaxes supercoiling of DNA/Synthesizes a short RNA primer/Unwinds the DNA double helix/Adds nucleotides to the growing DNA strand/Joins Okazaki fragments together",
+            answer: "Relaxes supercoiling of DNA",
+            select: "",
+            state: false
+        }, {
+            problem: "What protein prevents the separated DNA strands from reannealing during replication?",
+            choices: "Single-stranded binding proteins (SSB)/Helicase/Primase/DNA polymerase/Ligase",
+            answer: "Single-stranded binding proteins (SSB)",
+            select: "",
+            state: false
+        }, {
+            problem: "What enzyme synthesizes a short RNA primer to initiate DNA synthesis?",
+            choices: "Primase/Helicase/DNA polymerase/Ligase/None of the above",
+            answer: "Primase",
+            select: "",
+            state: false
+        }, {
+            problem: "Which DNA polymerase is responsible for the majority of DNA synthesis in prokaryotes?",
+            choices: "DNA polymerase III/DNA polymerase I/DNA polymerase II/DNA polymerase α/None of the above",
+            answer: "DNA polymerase III",
+            select: "",
+            state: false
+        }, {
+            problem: "What are Okazaki fragments?",
+            choices: "Short DNA fragments synthesized on the lagging strand during DNA replication/Short RNA fragments that serve as primers for DNA synthesis/Long continuous DNA fragments synthesized on the leading strand/Fragments of DNA that are removed during DNA repair/None of the above",
+            answer: "Short DNA fragments synthesized on the lagging strand during DNA replication",
+            select: "",
+            state: false
+        }, {
+            problem: "What are two functions of DNA polymerase I in prokaryotic DNA replication?",
+            choices: "Removal of RNA primers and proofreading newly synthesized DNA/Unwinding the DNA helix and stabilizing single strands/Joining Okazaki fragments together/None of the above",
+            answer: "Removal of RNA primers and proofreading newly synthesized DNA",
+            select: "",
+            state: false
+        }, {
+            problem: "What enzyme joins Okazaki fragments together on the lagging strand?",
+            choices: "DNA ligase/DNA polymerase/Primase/Helicase/None of the above",
+            answer: "DNA ligase",
+            select: "",
+            state: false
+        }, {
+            problem: "What cofactor is essential for the polymerase activity of DNA polymerase III?",
+            choices: "Magnesium ions (Mg²⁺)/Calcium ions (Ca²⁺)/Zinc ions (Zn²⁺)/Iron ions (Fe²⁺)/None of the above",
+            answer: "Magnesium ions (Mg²⁺)",
+            select: "",
+            state: false
+        }, {
+            problem: "What DNA polymerases are found in eukaryotic cells?",
+            choices: "DNA polymerase α, β, γ, σ, and ε/DNA polymerase I, II, and III/DNA polymerase δ, ε, and η/None of the above",
+            answer: "DNA polymerase α, β, γ, σ, and ε",
+            select: "",
+            state: false
+        }, {
+            problem: "What is the repetitive DNA sequence found at the ends of chromosomes in humans?",
+            choices: "TTAGGG/AATCCC/GGGGTT/None of the above",
+            answer: "TTAGGG",
+            select: "",
+            state: false
+        }, {
+            problem: "What enzyme extends telomeres, counteracting their shortening during DNA replication?",
+            choices: "Telomerase/DNA polymerase/Primase/Ligase/None of the above",
+            answer: "Telomerase",
+            select: "",
+            state: false
+        }, {
+            problem: "What type of DNA repair mechanism is error-prone and involves the direct rejoining of broken DNA ends?",
+            choices: "Non-homologous end joining/Homologous recombination/Base excision repair/Nucleotide excision repair/None of the above",
+            answer: "Non-homologous end joining",
+            select: "",
+            state: false
+        }, {
+            problem: "What drug inhibits telomerase and has potential applications in cancer treatment?",
+            choices: "Imetelstat/Cisplatin/Methotrexate/Aspirin/None of the above",
+            answer: "Imetelstat",
+            select: "",
+            state: false
+        }, {
+            problem: "What are the two main categories of mutations based on their scale and effect on chromosome structure?",
+            choices: "Point mutations (small scale) and large-scale mutations (affecting chromosome segments)/Germline mutations and Somatic mutations/Spontaneous mutations and Induced mutations/None of the above",
+            answer: "Point mutations (small scale) and large-scale mutations (affecting chromosome segments)",
+            select: "",
+            state: false
+        }, {
+            problem: "What type of point mutation involves a change from a purine base to another purine, or from a pyrimidine base to another pyrimidine?",
+            choices: "Transition/Transversion/Insertion/Deletion/None of the above",
+            answer: "Transition",
+            select: "",
+            state: false
+        }, {
+            problem: "What type of point mutation involves a change from a purine base to a pyrimidine base, or vice versa?",
+            choices: "Transversion/Transition/Insertion/Deletion/None of the above",
+            answer: "Transversion",
+            select: "",
+            state: false
+        }, {
+            problem: "Give three types of point mutations.",
+            choices: "Silent mutation, Missense mutation, and Nonsense mutation/Insertion, Deletion, and Frameshift/None of the above",
+            answer: "Silent mutation, Missense mutation, and Nonsense mutation",
+            select: "",
+            state: false
+        }, {
+            problem: "Give three examples of large-scale mutations that alter chromosome structure.",
+            choices: "Deletion, Duplication, and Translocation/Inversion, Transition, and Transversion/Substitution, Insertion, and Deletion/None of the above",
+            answer: "Deletion, Duplication, and Translocation",
+            select: "",
+            state: false
+        }, {
+            problem: "What type of DNA damage can lead to point mutations by the spontaneous deamination of cytosine to uracil?",
+            choices: "Deamination/Depurination/Oxidation/Alkylation/None of the above",
+            answer: "Deamination",
+            select: "",
+            state: false
+        }, {
+            problem: "Give two examples of exogenous mutagens that can induce mutations.",
+            choices: "Nitrous acid and Acridine/UV radiation and X-rays/Reactive oxygen species (ROS) and alkylating agents/None of the above",
+            answer: "Nitrous acid and Acridine",
+            select: "",
+            state: false
+        }, {
+            problem: "Give two types of DNA damage caused by UV radiation?",
+            choices: "Thymine dimers and DNA breaks/Depurination and Deamination/Oxidation and Alkylation/None of the above",
+            answer: "Thymine dimers and DNA breaks",
+            select: "",
+            state: false
+        }, {
+            problem: "What type of DNA repair mechanism uses visible light to repair thymine dimers?",
+            choices: "Direct repair (specifically photolyase)/Base excision repair/Nucleotide excision repair/Homologous recombination/None of the above",
+            answer: "Direct repair (specifically photolyase)",
+            select: "",
+            state: false
+        }, {
+            problem: "What DNA repair pathway removes damaged bases and replaces them with the correct ones?",
+            choices: "Base Excision Repair (BER)/Nucleotide Excision Repair (NER)/Direct Repair/DSBR/None of the above",
+            answer: "Base Excision Repair (BER)",
+            select: "",
+            state: false
+        }, {
+            problem: "What DNA repair pathway removes larger lesions, including thymine dimers, from DNA?",
+            choices: "Nucleotide Excision Repair (NER)/Base Excision Repair (BER)/Direct Repair/DSBR/None of the above",
+            answer: "Nucleotide Excision Repair (NER)",
+            select: "",
+            state: false
+        }, {
+            problem: "Give the three main types of RNA molecules involved in protein synthesis.",
+            choices: "tRNA, mRNA, and rRNA/miRNA, siRNA, and snRNA/None of the above",
+            answer: "tRNA, mRNA, and rRNA",
+            select: "",
+            state: false
+        }, {
+            problem: "What does transcription require as a template and does it need a primer?",
+            choices: "One DNA template and does NOT use RNA primer/Two DNA templates and uses RNA primer/One DNA template and uses RNA primer/Two DNA templates and does not use RNA primer/None of the above",
+            answer: "One DNA template and does NOT use RNA primer",
+            select: "",
+            state: false
+        }, {
+            problem: "Give three components involved in the initiation of transcription.",
+            choices: "Promoter, TATA box, and Pribnow box/RNA polymerase, ribosomes, and tRNA/Start codon, stop codon, and amino acids/None of the above",
+            answer: "Promoter, TATA box, and Pribnow box",
+            select: "",
+            state: false
+        }, {
+            problem: "What protein in prokaryotes binds to the promoter region of DNA to facilitate the binding of RNA polymerase?",
+            choices: "Sigma factor/Transcription factor/Initiation factor/None of the above",
+            answer: "Sigma factor",
+            select: "",
+            state: false
+        }, {
+            problem: "How many RNA polymerases do eukaryotes have?",
+            choices: "Three (RNA Polymerase I, II, and III)/One (RNA Polymerase)/Two (RNA Polymerase I and II)/None of the above",
+            answer: "Three (RNA Polymerase I, II, and III)",
+            select: "",
+            state: false
+        }, {
+            problem: "Which RNA polymerase is responsible for synthesizing rRNA in eukaryotes?",
+            choices: "RNA Polymerase I/RNA Polymerase II/RNA Polymerase III/None of the above",
+            answer: "RNA Polymerase I",
+            select: "",
+            state: false
+        }, {
+            problem: "Which RNA polymerase transcribes protein-coding genes into mRNA in eukaryotes?",
+            choices: "RNA polymerase II/RNA Polymerase I/RNA Polymerase III/None of the above",
+            answer: "RNA polymerase II",
+            select: "",
+            state: false
+        }, {
+            problem: "Which RNA polymerase synthesizes tRNA in eukaryotes?",
+            choices: "RNA Polymerase III/RNA Polymerase I/RNA Polymerase II/None of the above",
+            answer: "RNA Polymerase III",
+            select: "",
+            state: false
+        }, {
+            problem: "What are the two main mechanisms for transcription termination?",
+            choices: "Rho-dependent and Rho-independent termination/Intrinsic termination and Factor-dependent termination/None of the above",
+            answer: "Rho-dependent and Rho-independent termination",
+            select: "",
+            state: false
+        }, {
+            problem: "Give three modifications of eukaryotic mRNAs that occur during post-transcriptional processing.",
+            choices: "5' capping, 3' polyadenylation, and splicing/Base excision repair, nucleotide excision repair, and homologous recombination/Phosphorylation, glycosylation, and ubiquitination/None of the above",
+            answer: "5' capping, 3' polyadenylation, and splicing",
+            select: "",
+            state: false
+        }, {
+            problem: "What is the primary function of the 5' cap and 3' poly(A) tail added to mRNAs?",
+            choices: "Protect the mRNA from degradation and enhance translation efficiency/Facilitate the transport of mRNA out of the nucleus/Help in the recognition of mRNA by ribosomes/All of the above/None of the above",
+            answer: "All of the above",
+            select: "",
+            state: false
+        }, {
+            problem: "What process removes non-coding sequences (introns) from pre-mRNA, leaving the protein-coding sequences (exons) in the mature mRNA?",
+            choices: "Splicing/Capping/Polyadenylation/Editing/None of the above",
+            answer: "Splicing",
+            select: "",
+            state: false
+        }, {
+            problem: "What RNA-protein complexes are involved in splicing?",
+            choices: "snRNPs (small nuclear ribonucleoproteins)/Ribosomes/Spliceosomes/None of the above",
+            answer: "snRNPs (small nuclear ribonucleoproteins)",
+            select: "",
+            state: false
+        }, {
+            problem: "Give three sizes of rRNA in eukaryotic ribosomes after being cleaved by endonucleases.",
+            choices: "18S, 5.8S, and 28S/5S, 16S, and 23S/40S, 60S, and 80S/None of the above",
+            answer: "18S, 5.8S, and 28S",
+            select: "",
+            state: false
+        }, {
+            problem: "What is the sequence at the 3' end of tRNAs and is it related to its function?",
+            choices: "CCA and serves as the attachment site for amino acids/PolyA and is involved in mRNA stability/AUG and is the start codon for translation/None of the above",
+            answer: "CCA and serves as the attachment site for amino acids",
+            select: "",
+            state: false
+        }, {
+            problem: "What term refers to the phenomenon where a single tRNA can recognize multiple codons that specify the same amino acid due to flexibility in base pairing at the third position of the codon?",
+            choices: "Wobble hypothesis/Codon degeneracy/Redundancy of the genetic code/None of the above",
+            answer: "Wobble hypothesis",
+            select: "",
+            state: false
+        }, {
+            problem: "Give two structural components of a ribosome.",
+            choices: "Large subunit and Small subunit/mRNA and tRNA/Protein and carbohydrate/None of the above",
+            answer: "Large subunit and Small subunit",
+            select: "",
+            state: false
+        }, {
+            problem: "What are the three sites on the ribosome that bind tRNAs during translation?",
+            choices: "A (aminoacyl) site, P (peptidyl) site, and E (exit) site/Initiation site, Elongation site, and Termination site/None of the above",
+            answer: "A (aminoacyl) site, P (peptidyl) site, and E (exit) site",
+            select: "",
+            state: false
+        }, {
+            problem: "What is the function of tRNA?",
+            choices: "Carries amino acids to the ribosome for protein synthesis/Carries the genetic information from DNA to the ribosome/Forms the structural and catalytic core of the ribosome/None of the above",
+            answer: "Carries amino acids to the ribosome for protein synthesis",
+            select: "",
+            state: false
+        }, {
+            problem: "What enzyme charges tRNAs with their corresponding amino acids, consuming ATP in the process?",
+            choices: "Aminoacyl-tRNA synthetase/Peptidyl transferase/RNA polymerase/DNA polymerase/None of the above",
+            answer: "Aminoacyl-tRNA synthetase",
+            select: "",
+            state: false
+        }, {
+            problem: "What is the start codon for protein synthesis and what amino acid does it code for?",
+            choices: "AUG; Methionine/UAA; Stop/UAG; Stop/UGA; Stop/None of the above",
+            answer: "AUG; Methionine",
+            select: "",
+            state: false
+        }, {
+            problem: "Give the three stop codons for protein synthesis.",
+            choices: "UAA, UAG, and UGA/AUG, UGG, and UUU/AAA, CCC, and GGG/None of the above",
+            answer: "UAA, UAG, and UGA",
+            select: "",
+            state: false
+        }, {
+            problem: "What two subunits make up a prokaryotic ribosome (70S) ?",
+            choices: "50S (large subunit) and 30S (small subunit)/60S and 40S/30S and 40S/50S and 60S/None of the above",
+            answer: "50S (large subunit) and 30S (small subunit)",
+            select: "",
+            state: false
+        }, {
+            problem: "What two subunits make up a eukaryotic ribosome (80S) ?",
+            choices: "60S (large subunit) and 40S (small subunit)/50S and 30S/30S and 40S/50S and 60S/None of the above",
+            answer: "60S (large subunit) and 40S (small subunit)",
+            select: "",
+            state: false
+        }, {
+            problem: "What type of mRNA is found in prokaryotes, containing multiple coding sequences that can be translated into multiple proteins?",
+            choices: "Polycistronic mRNA/Monocistronic mRNA",
+            answer: "Polycistronic mRNA",
+            select: "",
+            state: false
+        }, {
+            problem: "What type of mRNA is found in eukaryotes, typically containing a single coding sequence that is translated into a single protein?",
+            choices: "Monocistronic mRNA/Polycistronic mRNA",
+            answer: "Monocistronic mRNA",
+            select: "",
+            state: false
+        }, {
+            problem: "What protein complex, involved in the initiation of translation, binds to the small ribosomal subunit (sRB) in prokaryotes?",
+            choices: "Initiation factors (IFs)/Elongation factors (EFs)/Release factors (RFs)/None of the above",
+            answer: "Initiation factors (IFs)",
+            select: "",
+            state: false
+        }, {
+            problem: "What type of RNA molecule is charged with methionine and binds to the start codon (AUG) on mRNA during the initiation of translation?",
+            choices: "Initiator tRNA (tRNAiMet)/Elongator tRNA/Release factor tRNA/None of the above",
+            answer: "Initiator tRNA (tRNAiMet)",
+            select: "",
+            state: false
+        }, {
+            problem: "What enzyme, within the ribosome, catalyzes the formation of peptide bonds between amino acids during translation?",
+            choices: "Peptidyl Transferase/Aminoacyl-tRNA Synthetase/None of the above",
+            answer: "Peptidyl Transferase",
+            select: "",
+            state: false
+        }, {
+            problem: "What type of factors facilitate the termination of translation when a stop codon is encountered on the mRNA?",
+            choices: "Release factors/Initiation factors/Elongation factors/None of the above",
+            answer: "Release factors",
+            select: "",
+            state: false
+        }, {
+            problem: "Give two inhibitors of protein synthesis that are commonly used as antibiotics.",
+            choices: "Cycloheximide and Streptomycin/Penicillin and Ampicillin/Tetracycline and Erythromycin/Chloramphenicol and Puromycin/None of the above",
+            answer: "Cycloheximide and Streptomycin",
+            select: "",
+            state: false
+        }, {
+            problem: "What ribosomal subunit does cycloheximide bind to, inhibiting eukaryotic protein synthesis?",
+            choices: "60S/30S/50S/40S/None of the above",
+            answer: "60S",
+            select: "",
+            state: false
+        }, {
+            problem: "What process occurs during termination when a stop codon enters the A site of the ribosome, causing hydrolysis and the release of the newly synthesized polypeptide?",
+            choices: "Hydrolysis and release of polypeptide/Peptide bond formation/Translocation of the ribosome/None of the above",
+            answer: "Hydrolysis and release of polypeptide",
+            select: "",
+            state: false
+        }, {
+            problem: "Which antibiotic binds to the 30S ribosomal subunit, interfering with the initiation of translation and causing misreading of mRNA?",
+            choices: "Streptomycin/Cycloheximide/Tetracycline/Puromycin/Chloramphenicol",
+            answer: "Streptomycin",
+            select: "",
+            state: false
+        }, {
+            problem: "Which antibiotic inhibits protein synthesis by blocking the binding of aminoacyl-tRNA to the A site of the ribosome?",
+            choices: "Tetracycline/Erythromycin/Chloramphenicol/Puromycin/None of the above",
+            answer: "Tetracycline",
+            select: "",
+            state: false
+        }, {
+            problem: "Which antibiotic blocks the translocation of the ribosome along mRNA?",
+            choices: "Erythromycin/Tetracycline/Chloramphenicol/Puromycin/None of the above",
+            answer: "Erythromycin",
+            select: "",
+            state: false
+        }, {
+            problem: "Which antibiotic inhibits peptidyl transferase, blocking peptide bond formation?",
+            choices: "Chloramphenicol/Tetracycline/Erythromycin/Puromycin/None of the above",
+            answer: "Chloramphenicol",
+            select: "",
+            state: false
+        }, {
+            problem: "What are post-translational modifications (PTMs)?",
+            choices: "Covalent modifications of proteins that occur after translation, affecting their function, localization, or stability/Changes in the DNA sequence that can lead to mutations/Alterations in the RNA sequence that affect splicing/None of the above",
+            answer: "Covalent modifications of proteins that occur after translation, affecting their function, localization, or stability",
+            select: "",
+            state: false
+        }, {
+            problem: "Give two examples of protein processing.",
+            choices: "Cleavage by proteases and protein folding/Phosphorylation and glycosylation/Acetylation and ubiquitination/None of the above",
+            answer: "Cleavage by proteases and protein folding",
+            select: "",
+            state: false
+        }, {
+            problem: "Give three common types of PTMs.",
+            choices: "Phosphorylation, glycosylation, and acetylation/Methylation, ubiquitination, and SUMOylation/Prenylation, myristoylation, and palmitoylation/All of the above are common types of PTMs/None of the above",
+            answer: "All of the above are common types of PTMs",
+            select: "",
+            state: false
+        }, {
+            problem: "What three amino acids can be phosphorylated by kinases?",
+            choices: "Serine, Threonine, and Tyrosine/Alanine, Glycine, and Valine/Phenylalanine, Tryptophan, and Histidine/Aspartic Acid, Glutamic Acid, and Lysine/None of the above",
+            answer: "Serine, Threonine, and Tyrosine",
+            select: "",
+            state: false
+        }, {
+            problem: "Give an example of a signal transduction pathway often dysregulated in cancer that involves the phosphorylation of tyrosine residues?",
+            choices: "Mitogen-activated protein kinase (MAPK) pathway/cAMP/PKA pathway/PI3K/Akt pathway/JAK/STAT pathway/None of the above",
+            answer: "Mitogen-activated protein kinase (MAPK) pathway",
+            select: "",
+            state: false
+        }, {
+            problem: "Give two possible outcomes when proteins are modified by protein glycosylation.",
+            choices: "Cell surface marker and signaling/Degradation and recycling/Transcriptional activation and repression/None of the above",
+            answer: "Cell surface marker and signaling",
+            select: "",
+            state: false
+        }, {
+            problem: "What type of amino acid sequence serves as a signal for protein import into the nucleus?",
+            choices: "Nuclear Localization Sequence (NLS)/Signal peptide/Transmembrane domain/None of the above",
+            answer: "Nuclear Localization Sequence (NLS)",
+            select: "",
+            state: false
+        }, {
+            problem: "What type of protein binds to NLS and facilitates transport into the nucleus?",
+            choices: "Importin/Exportin/Chaperone/None of the above",
+            answer: "Importin",
+            select: "",
+            state: false
+        }, {
+            problem: "Give two examples of modifications occurring in histone proteins that regulate chromatin structure and gene expression.",
+            choices: "Acetylation and Deacetylation/Phosphorylation and Glycosylation/Methylation and Ubiquitination/SUMOylation and ADP-ribosylation/None of the above",
+            answer: "Acetylation and Deacetylation",
+            select: "",
+            state: false
+        }, {
+            problem: "Which histone modifying enzyme is associated with euchromatin formation and gene expression?",
+            choices: "HAT (histone acetyltransferase)/HDAC (histone deacetylase)",
+            answer: "HAT (histone acetyltransferase)",
+            select: "",
+            state: false
+        }, {
+            problem: "Inhibition of what enzyme has potential applications in cancer therapy by increasing the expression of tumor suppressor genes?",
+            choices: "HDAC/HAT",
+            answer: "HDAC",
+            select: "",
+            state: false
+        }, {
+            problem: "What two amino acid residues in collagen are frequently modified by hydroxylation, crucial for its structural integrity?",
+            choices: "Proline and Lysine/Serine and Threonine/Cysteine and Methionine/Aspartate and Glutamate/None of the above",
+            answer: "Proline and Lysine",
+            select: "",
+            state: false
+        }, {
+            problem: "What is ubiquitination and its primary function?",
+            choices: "A post-translational modification where ubiquitin is attached to a protein, often signaling for protein degradation/A type of glycosylation that adds sugar molecules to proteins/A process that modifies histone proteins/None of the above",
+            answer: "A post-translational modification where ubiquitin is attached to a protein, often signaling for protein degradation",
+            select: "",
+            state: false
+        }];
+        var questions3 = [{
+            problem: "Give two regulatory elements that enhance gene expression.",
+            choices: "Enhancer and Activator/Repressor and Silencer/Promoter and Operator/None of the above",
+            answer: "Enhancer and Activator",
+            select: "",
+            state: false
+        }, {
+            problem: "Give two regulatory elements that decrease gene expression.",
+            choices: "Repressor and Silencer/Enhancer and Activator/Promoter and Operator/None of the above",
+            answer: "Repressor and Silencer",
+            select: "",
+            state: false
+        }, {
+            problem: "What is attenuation?",
+            choices: "A mechanism of gene regulation that conserves energy by prematurely terminating transcription/A type of mutation that changes the DNA sequence/A post-translational modification that alters protein function/None of the above",
+            answer: "A mechanism of gene regulation that conserves energy by prematurely terminating transcription",
+            select: "",
+            state: false
+        }, {
+            problem: "Give four DNA sequences involved in cis-regulation of gene expression.",
+            choices: "Promoter, Enhancer, Silencer, and Operator/Transcription factors, Hormones, and miRNAs/None of the above",
+            answer: "Promoter, Enhancer, Silencer, and Operator",
+            select: "",
+            state: false
+        }, {
+            problem: "Give three factors involved in trans-regulation of gene expression.",
+            choices: "Transcription factors, Hormones, and miRNAs/Promoter, Enhancer, and Silencer/None of the above",
+            answer: "Transcription factors, Hormones, and miRNAs",
+            select: "",
+            state: false
+        }, {
+            problem: "What is a cistron?",
+            choices: "A DNA segment that codes for a single polypeptide chain/A group of genes transcribed together under the control of a single promoter/A type of mutation that alters the reading frame/None of the above",
+            answer: "A DNA segment that codes for a single polypeptide chain",
+            select: "",
+            state: false
+        }, {
+            problem: "What type of gene is continuously expressed in all cells, regardless of conditions?",
+            choices: "Housekeeping gene/Inducible gene",
+            answer: "Housekeeping gene",
+            select: "",
+            state: false
+        }, {
+            problem: "What type of gene is expressed only under specific conditions or in response to certain stimuli?",
+            choices: "Inducible gene/Housekeeping gene",
+            answer: "Inducible gene",
+            select: "",
+            state: false
+        }, {
+            problem: "What is the primary site of gene regulation in most organisms?",
+            choices: "Transcription/Translation/Post-translational modification/DNA replication/None of the above",
+            answer: "Transcription",
+            select: "",
+            state: false
+        }, {
+            problem: "What does an operon consist of and where is it found?",
+            choices: "A group of genes under the control of the same promoter found in prokaryotes/A group of genes under the control of different promoters found in eukaryotes/A single gene that can be transcribed into multiple mRNA transcripts/None of the above",
+            answer: "A group of genes under the control of the same promoter found in prokaryotes",
+            select: "",
+            state: false
+        }, {
+            problem: "What does the Trp operon code for?",
+            choices: "Enzymes involved in Tryptophan biosynthesis/Enzymes involved in lactose metabolism/Proteins for DNA replication/Ribosomal proteins/None of the above",
+            answer: "Enzymes involved in Tryptophan biosynthesis",
+            select: "",
+            state: false
+        }, {
+            problem: "What happens to the Trp operon when tryptophan levels are high?",
+            choices: "Tryptophan binds to a repressor protein, which then binds to the operator, preventing RNA polymerase from transcribing the operon/Tryptophan binds to the promoter, enhancing the binding of RNA polymerase and increasing transcription/Tryptophan has no effect on the Trp operon/None of the above",
+            answer: "Tryptophan binds to a repressor protein, which then binds to the operator, preventing RNA polymerase from transcribing the operon",
+            select: "",
+            state: false
+        }, {
+            problem: "What is the name of the regulatory mechanism in the Trp operon that conserves energy by prematurely terminating transcription when tryptophan levels are high?",
+            choices: "Attenuation/Repression/Induction/Activation/None of the above",
+            answer: "Attenuation",
+            select: "",
+            state: false
+        }, {
+            problem: "What enzymes does the Lac operon code for?",
+            choices: "Enzymes involved in lactose metabolism/Enzymes involved in tryptophan biosynthesis/Proteins for DNA replication/Ribosomal proteins/None of the above",
+            answer: "Enzymes involved in lactose metabolism",
+            select: "",
+            state: false
+        }, {
+            problem: "Under what conditions is the Lac operon 'on' and lactose can be metabolized?",
+            choices: "Low glucose and high lactose/High glucose and high lactose/Low glucose and low lactose/High glucose and low lactose/None of the above",
+            answer: "Low glucose and high lactose",
+            select: "",
+            state: false
+        }, {
+            problem: "What molecule accumulates when glucose levels are low and binds to CAP (catabolite activator protein), enhancing the binding of RNA polymerase to the Lac promoter?",
+            choices: "cAMP (cyclic AMP)/ATP/ADP/Glucose-6-phosphate/None of the above",
+            answer: "cAMP (cyclic AMP)",
+            select: "",
+            state: false
+        }, {
+            problem: "What sequence, present in prokaryotes, is analogous to the promoter in eukaryotes and helps position the ribosome for translation initiation?",
+            choices: "Shine-Dalgarno sequence/Pribnow box/TATA box/Enhancer/None of the above",
+            answer: "Shine-Dalgarno sequence",
+            select: "",
+            state: false
+        }, {
+            problem: "What is the function of ribosomal proteins (R-proteins) during translation?",
+            choices: "Ensure the proper pairing between codons on mRNA and anticodons on tRNA/Catalyze peptide bond formation/Translocate the ribosome along mRNA/Terminate translation/None of the above",
+            answer: "Ensure the proper pairing between codons on mRNA and anticodons on tRNA",
+            select: "",
+            state: false
+        }, {
+            problem: "In eukaryotes, what regulatory elements can be located far from the gene they regulate and interact with the transcriptional machinery through DNA looping?",
+            choices: "Enhancers/Promoters/Operators/Silencers/None of the above",
+            answer: "Enhancers",
+            select: "",
+            state: false
+        }, {
+            problem: "What is the term for heritable changes in gene expression that do not involve alterations in the DNA sequence itself, often involving modifications to DNA or histone proteins?",
+            choices: "Epigenetics/Mutations/Genetic recombination/Horizontal gene transfer/None of the above",
+            answer: "Epigenetics",
+            select: "",
+            state: false
+        }, {
+            problem: "What modification of histone proteins is associated with increased gene expression?",
+            choices: "Acetylation/Methylation/Phosphorylation/Ubiquitination/None of the above",
+            answer: "Acetylation",
+            select: "",
+            state: false
+        }, {
+            problem: "What DNA modification, involving the addition of a methyl group to cytosine bases, is often associated with gene silencing?",
+            choices: "Methylation/Acetylation/Phosphorylation/Ubiquitination/None of the above",
+            answer: "Methylation",
+            select: "",
+            state: false
+        }, {
+            problem: "Give two genetic disorders resulting from a deletion in Chromosome 15. Both differ in the parental origin of the deleted chromosome.",
+            choices: "Prader-Willi syndrome (paternal deletion) and Angelman syndrome (maternal deletion)/Down syndrome and Turner syndrome/Cystic fibrosis and Huntington's disease/None of the above",
+            answer: "Prader-Willi syndrome (paternal deletion) and Angelman syndrome (maternal deletion)",
+            select: "",
+            state: false
+        }, {
+            problem: "Deletion of what gene can cause retinoblastoma, a type of eye cancer?",
+            choices: "RB1/p53/BRCA1/APC/None of the above",
+            answer: "RB1",
+            select: "",
+            state: false
+        }, {
+            problem: "What DNA sequence, often found in enhancers, serves as a binding site for steroid hormone receptors, influencing gene expression?",
+            choices: "Hormone response element (HRE)/TATA box/Promoter/Operator/None of the above",
+            answer: "Hormone response element (HRE)",
+            select: "",
+            state: false
+        }, {
+            problem: "Where in the cell are steroid hormone receptors typically located when they are not bound to their ligands?",
+            choices: "Nuclear pore/Cytoplasm/Cell membrane/Mitochondria/Endoplasmic reticulum",
+            answer: "Cytoplasm",
+            select: "",
+            state: false
+        }, {
+            problem: "What is a common structural feature of peptide hormones that allows them to interact with cell membrane receptors?",
+            choices: "Signal peptides/Transmembrane domains/Nuclear localization signals/None of the above",
+            answer: "Signal peptides",
+            select: "",
+            state: false
+        }, {
+            problem: "What process allows for the production of multiple protein isoforms from a single gene?",
+            choices: "Alternative splicing/Alternative translation/Post-translational modification/None of the above",
+            answer: "Alternative splicing",
+            select: "",
+            state: false
+        }, {
+            problem: "What type of RNA editing involves the deamination of cytosine to uracil?",
+            choices: "C to U editing/A to I editing/None of the above",
+            answer: "C to U editing",
+            select: "",
+            state: false
+        }, {
+            problem: "What are two modifications that enhance mRNA stability and translation efficiency in eukaryotes?",
+            choices: "5' cap and 3' poly(A) tail/Splicing and editing/None of the above",
+            answer: "5' cap and 3' poly(A) tail",
+            select: "",
+            state: false
+        }, {
+            problem: "What biological process, involving dsRNA molecules, provides a defense mechanism against viral infections in many organisms?",
+            choices: "RNA interference (RNAi)/DNA methylation/Histone acetylation/None of the above",
+            answer: "RNA interference (RNAi)",
+            select: "",
+            state: false
+        }, {
+            problem: "What enzyme cleaves dsRNA into small interfering RNAs (siRNAs)?",
+            choices: "Dicer/RISC/Argonaute/None of the above",
+            answer: "Dicer",
+            select: "",
+            state: false
+        }, {
+            problem: "What protein complex associates with siRNA and guides the degradation of complementary mRNAs, silencing gene expression?",
+            choices: "RISC (RNA-induced silencing complex)/Dicer/Argonaute/None of the above",
+            answer: "RISC (RNA-induced silencing complex)",
+            select: "",
+            state: false
+        }, {
+            problem: "What type of small RNA molecules regulate gene expression by binding to target mRNAs, often leading to translational repression or degradation?",
+            choices: "MicroRNAs (miRNAs)/siRNAs/tRNAs/rRNAs/None of the above",
+            answer: "MicroRNAs (miRNAs)",
+            select: "",
+            state: false
+        }];
+        var questions4 = [{
+            problem: "What are the three key aspects to consider when analyzing patterns of genetic inheritance?",
+            choices: "Transmission pattern, sex linkage, and segregation percentage/Penetrance, expressivity, and anticipation/Phenotype, genotype, and allele frequency/Dominance, recessiveness, and codominance/None of the above",
+            answer: "Transmission pattern, sex linkage, and segregation percentage",
+            select: "",
+            state: false
+        }, {
+            problem: "What type of genetic transmission describes traits passed from parents to offspring?",
+            choices: "Vertical transmission/Horizontal transmission/Diagonal transmission/None of the above",
+            answer: "Vertical transmission",
+            select: "",
+            state: false
+        }, {
+            problem: "What type of inheritance pattern is characterized by the expression of a specific trait even when only one copy of the dominant allele is present?",
+            choices: "Autosomal dominant (AD)/Autosomal recessive (AR)/X-linked dominant/X-linked recessive/Y-linked",
+            answer: "Autosomal dominant (AD)",
+            select: "",
+            state: false
+        }, {
+            problem: "Give three examples of autosomal dominant disorders.",
+            choices: "Hypercholesterolemia, Huntington's disease, and Marfan syndrome/Thalassemia, sickle cell anemia, and albinism/Color blindness and hemophilia/Duchenne muscular dystrophy (DMD) and G6PD deficiency/None of the above",
+            answer: "Hypercholesterolemia, Huntington's disease, and Marfan syndrome",
+            select: "",
+            state: false
+        }, {
+            problem: "What genetic feature characterizes Huntington's disease, causing an expansion of CAG repeats within the gene?",
+            choices: "Microsatellite expansion/Gene deletion/Translocation/Inversion/None of the above",
+            answer: "Microsatellite expansion",
+            select: "",
+            state: false
+        }, {
+            problem: "Give three symptoms associated with Marfan Syndrome.",
+            choices: "Long limbs, long fingers, and tall stature/Short stature, bone deformities, and developmental delay/Mental retardation, behavioral problems, and obesity/Skin lesions, hypophosphatemia, and skeletal abnormalities/None of the above",
+            answer: "Long limbs, long fingers, and tall stature",
+            select: "",
+            state: false
+        }, {
+            problem: "What is polydactyly?",
+            choices: "Extra fingers or toes/Absence of limbs/Webbed fingers or toes/Shortened limbs/None of the above",
+            answer: "Extra fingers or toes",
+            select: "",
+            state: false
+        }, {
+            problem: "What autosomal dominant disorder results from a mutation in the FGFR3 gene, leading to impaired cartilage growth?",
+            choices: "Achondroplasia/Polycystic kidney disease/Neurofibromatosis/Hereditary spherocytosis/Osteogenesis imperfecta",
+            answer: "Achondroplasia",
+            select: "",
+            state: false
+        }, {
+            problem: "Give two examples of autosomal recessive disorders that are related to defects in metabolism.",
+            choices: "Thalassemia and PKU/Cystic fibrosis and Galactosemia/Gaucher disease and Maple syrup urine disease/Neurofibromatosis and polycystic kidney disease/Huntington's disease and Marfan syndrome",
+            answer: "Thalassemia and PKU",
+            select: "",
+            state: false
+        }, {
+            problem: "What condition, common in families with a history of consanguinity, increases the likelihood of inheriting two copies of a rare recessive allele, leading to the expression of the associated trait?",
+            choices: "Pseudodominance/Heterozygote advantage/Founder effect/Genetic drift/None of the above",
+            answer: "Pseudodominance",
+            select: "",
+            state: false
+        }, {
+            problem: "What metabolic disorder, characterized by a deficiency in homogentisate 1,2-dioxygenase, results in the accumulation of homogentisic acid, leading to darkening of urine and ochronosis (darkening of cartilage and other tissues)?",
+            choices: "Alkaptonuria/Phenylketonuria (PKU)/Thalassemia/Sickle cell anemia/Albinism",
+            answer: "Alkaptonuria",
+            select: "",
+            state: false
+        }, {
+            problem: "What pattern of inheritance describes traits passed down through the X chromosome?",
+            choices: "X-linked inheritance/Autosomal inheritance/Y-linked inheritance/Mitochondrial inheritance/None of the above",
+            answer: "X-linked inheritance",
+            select: "",
+            state: false
+        }, {
+            problem: "In what sex are X-linked recessive disorders most commonly expressed, and why?",
+            choices: "Males, because they only have one X chromosome/Females, because they have two X chromosomes/Both sexes are equally affected/Neither sex is affected/It depends on the specific disorder",
+            answer: "Males, because they only have one X chromosome",
+            select: "",
+            state: false
+        }, {
+            problem: "Is male-to-male transmission possible for X-linked traits?",
+            choices: "No/Yes, but only if the father is affected and the mother is a carrier/Yes, regardless of the parents' genotypes/It depends on environmental factors/None of the above",
+            answer: "No",
+            select: "",
+            state: false
+        }, {
+            problem: "Give two examples of X-linked recessive disorders.",
+            choices: "Color blindness and Hemophilia/Duchenne muscular dystrophy and G6PD deficiency/Incontinentia pigmenti and hypophosphatemia/Huntington's disease and Marfan syndrome/None of the above",
+            answer: "Color blindness and Hemophilia",
+            select: "",
+            state: false
+        }, {
+            problem: "Give an example of an X-linked dominant disorder affecting skin pigmentation.",
+            choices: "Incontinentia pigmenti/Hypophosphatemia/Rett Syndrome/None of the above",
+            answer: "Incontinentia pigmenti",
+            select: "",
+            state: false
+        }, {
+            problem: "What is a prominent feature of individuals with Y-linked inheritance?",
+            choices: "They are all male/They are all female/Both sexes are affected/Neither sex is affected/It depends on environmental factors",
+            answer: "They are all male",
+            select: "",
+            state: false
+        }, {
+            problem: "What is incomplete penetrance?",
+            choices: "Individuals with a disease-causing genotype may not exhibit the associated phenotype/A trait is only expressed in a certain percentage of individuals with the genotype/A trait's severity varies among individuals with the same genotype/None of the above",
+            answer: "Individuals with a disease-causing genotype may not exhibit the associated phenotype",
+            select: "",
+            state: false
+        }, {
+            problem: "Give two examples of genes that are frequently associated with incomplete penetrance, particularly in the context of breast cancer.",
+            choices: "BRCA1 and BRCA2/APC and p53/Huntington and CFTR/None of the above",
+            answer: "BRCA1 and BRCA2",
+            select: "",
+            state: false
+        }, {
+            problem: "What is a new mutation in the context of genetic inheritance?",
+            choices: "A mutation that arises spontaneously in an individual, not inherited from parents/A mutation that has been present in a family for many generations/A mutation that is beneficial and increases fitness/None of the above",
+            answer: "A mutation that arises spontaneously in an individual, not inherited from parents",
+            select: "",
+            state: false
+        }, {
+            problem: "Give an example of a disorder that frequently arises due to new mutations.",
+            choices: "Achondroplasia/Huntington's disease/Cystic fibrosis/Sickle cell anemia/None of the above",
+            answer: "Achondroplasia",
+            select: "",
+            state: false
+        }, {
+            problem: "What phenomenon occurs when the same genetic mutation causes a range of different clinical features or disease severity in individuals?",
+            choices: "Variable expressivity/Pleiotropy/Anticipation/Genetic heterogeneity/None of the above",
+            answer: "Variable expressivity",
+            select: "",
+            state: false
+        }, {
+            problem: "What term describes the situation where a single gene mutation affects multiple seemingly unrelated traits or organ systems?",
+            choices: "Pleiotropy/Variable expressivity/Anticipation/Genetic heterogeneity/None of the above",
+            answer: "Pleiotropy",
+            select: "",
+            state: false
+        }, {
+            problem: "Give an example of a genetic disorder characterized by pleiotropy, affecting the skeletal system, cardiovascular system, and eyes?",
+            choices: "Marfan syndrome/Cystic fibrosis/Huntington's disease/Sickle cell anemia/None of the above",
+            answer: "Marfan syndrome",
+            select: "",
+            state: false
+        }, {
+            problem: "What term describes the situation where mutations in different genes at different loci can cause the same phenotype or disease?",
+            choices: "Locus heterogeneity/Allelic heterogeneity/Genetic heterogeneity/None of the above",
+            answer: "Locus heterogeneity",
+            select: "",
+            state: false
+        }, {
+            problem: "What term describes the situation where mutations in different alleles at the same locus can cause the same phenotype or disease?",
+            choices: "Allelic heterogeneity/Locus heterogeneity/Genetic heterogeneity/None of the above",
+            answer: "Allelic heterogeneity",
+            select: "",
+            state: false
+        }, {
+            problem: "Give two examples of disorders exhibiting allelic heterogeneity.",
+            choices: "β-thalassemia and Duchenne muscular dystrophy/Huntington's disease and Marfan syndrome/Cystic fibrosis and Sickle cell anemia/None of the above",
+            answer: "β-thalassemia and Duchenne muscular dystrophy",
+            select: "",
+            state: false
+        }, {
+            problem: "What epigenetic phenomenon occurs when the expression of a gene depends on whether it was inherited from the mother or the father?",
+            choices: "Genomic Imprinting/DNA methylation/Histone acetylation/X-chromosome inactivation/None of the above",
+            answer: "Genomic Imprinting",
+            select: "",
+            state: false
+        }, {
+            problem: "During what process does imprinting often occur, leading to uniparental disomy (UPD) ?",
+            choices: "Gametogenesis/Mitosis/Meiosis/Fertilization/None of the above",
+            answer: "Gametogenesis",
+            select: "",
+            state: false
+        }, {
+            problem: "What epigenetic mark plays a crucial role in imprinting, silencing the expression of one parental allele?",
+            choices: "DNA methylation/Histone acetylation/Histone methylation/DNA demethylation/None of the above",
+            answer: "DNA methylation",
+            select: "",
+            state: false
+        }, {
+            problem: "Give an example of a disorder caused by paternal uniparental disomy of chromosome 15.",
+            choices: "Prader-Willi syndrome/Angelman syndrome/Beckwith-Wiedemann syndrome/Silver-Russell syndrome/None of the above",
+            answer: "Prader-Willi syndrome",
+            select: "",
+            state: false
+        }, {
+            problem: "Give an example of a disorder caused by maternal uniparental disomy of chromosome 15.",
+            choices: "Angelman syndrome/Prader-Willi syndrome/Beckwith-Wiedemann syndrome/Silver-Russell syndrome/None of the above",
+            answer: "Angelman syndrome",
+            select: "",
+            state: false
+        }, {
+            problem: "What is the unique feature of mitochondrial inheritance in terms of transmission to offspring?",
+            choices: "It is inherited exclusively from the mother/It is inherited exclusively from the father/It is inherited from both parents/It is not inherited at all/None of the above",
+            answer: "It is inherited exclusively from the mother",
+            select: "",
+            state: false
+        }, {
+            problem: "Give three types of disorders that are often associated with mitochondrial inheritance.",
+            choices: "Neurological diseases, myopathy, and cardiomyopathy/Skeletal dysplasia, dwarfism, and bone disorders/Metabolic disorders, endocrine dysfunction, and immune deficiencies/None of the above",
+            answer: "Neurological diseases, myopathy, and cardiomyopathy",
+            select: "",
+            state: false
+        }, {
+            problem: "What is genetic mosaicism?",
+            choices: "The presence of two or more genetically distinct cell lines in an individual, arising from a single zygote/The presence of multiple alleles for a single gene in a population/The exchange of genetic material between homologous chromosomes during meiosis/The transfer of genetic material from one bacterium to another/None of the above",
+            answer: "The presence of two or more genetically distinct cell lines in an individual, arising from a single zygote",
+            select: "",
+            state: false
+        }, {
+            problem: "What type of mosaicism affects cells in the body (somatic cells)?",
+            choices: "Somatic mosaicism/Germline mosaicism/Gonadal mosaicism/None of the above",
+            answer: "Somatic mosaicism",
+            select: "",
+            state: false
+        }, {
+            problem: "What type of mosaicism affects cells in the gonads (testes or ovaries), potentially leading to the transmission of genetic mutations to offspring?",
+            choices: "Germline mosaicism/Somatic mosaicism/Gonadal mosaicism/None of the above",
+            answer: "Germline mosaicism",
+            select: "",
+            state: false
+        }, {
+            problem: "Give an example of a disorder frequently associated with mosaicism, caused by defects in type I collagen formation.",
+            choices: "Osteogenesis imperfecta/Marfan syndrome/Ehlers-Danlos syndrome/None of the above",
+            answer: "Osteogenesis imperfecta",
+            select: "",
+            state: false
+        }];
+        var questions = questions1.concat(questions2, questions3, questions4);
+
+        var current_question = {};
+        var score = 0;
+
+        // make function if check box is active then include array in random_question
+        // if not active then remove array from random_question
+        $("input[type='checkbox']").change(function () {
+            $("#feedback").text("");
+            var quiz1 = document.getElementById("quiz1").checked;
+            var quiz2 = document.getElementById("quiz2").checked;
+            var quiz3 = document.getElementById("quiz3").checked;
+            var quiz4 = document.getElementById("quiz4").checked;
+            random_question = [];
+            // reset score = 0 when use check box
+            score = 0;
+            if (quiz1 && !quiz2 && !quiz3 && !quiz4) {
+                random_question = random_question.concat(questions1);
+            }
+            if (quiz2 && !quiz1 && !quiz3 && !quiz4) {
+                random_question = random_question.concat(questions2);
+            }
+            if (quiz3 && !quiz1 && !quiz2 && !quiz4) {
+                random_question = random_question.concat(questions3);
+            }
+            if (quiz4 && !quiz1 && !quiz2 && !quiz3) {
+                random_question = random_question.concat(questions4);
+            }
+            if (!quiz1 && !quiz2 && !quiz3 && !quiz4) {
+                random_question = questions;
+            }
+            random_question = random_question.sort(() => Math.random() - 0.5);
+            $("#score").text(" " + "Score: " + score + "/" + random_question.length);
+            $("feedback").text("");
+            questionIndex = 0;
+            showquestion();
+        });
+
+
+        function nextquestion() {
+            if (questionIndex < random_question.length - 1) {
+                questionIndex++;
+                console.log(questionIndex);
+                showquestion();
+                $("#answer").val("");
+                if (random_question[questionIndex].state === false) {
+                    $("#feedback").text("");
+                }
+                else {
+                    $("#feedback").text("Answer : " + " " + random_question[questionIndex].answer);
+                }
+
+            }
+        }
+
+
+        $("#next-question").click(function () {
+            if (!random_question[questionIndex].state) {
+                alert("Please select an answer");
+                return;
+            }
+            else {
+                nextquestion();
+            }
+        });
+
+        function prevquestion() {
+            if (questionIndex > 0) {
+                questionIndex--;
+                console.log(questionIndex);
+                showquestion();
+                $("#answer").val("");
+                $("#feedback").text("Answer : " + " " + random_question[questionIndex].answer);
+            }
+        }
+
+        $("#prev-question").click(function () {
+            prevquestion();
+        });
+
+        function showquestion() {
+            showsubmission(random_question);
+            console.log(random_question);
+            console.log(questionIndex);
+            current_question = random_question[questionIndex];
+            if (current_question.state === true) {
+                $("#question").text(current_question.problem);
+                $("#choices").empty();
+                var choices = current_question.choices.split("/");
+                for (var i = 0; i < choices.length; i++) {
+                    $("#choices").append("<button>" + choices[i] + "</button>");
+                }
+                $("#feedback").empty();
+                if (current_question.select === current_question.answer) {
+                    $("#feedback").addClass("correct");
+                    $("#feedback").text("Correct! : " + " " + current_question.answer);
+                } else {
+                    $("#feedback").text("Incorrect!, Your Ans: " + current_question.select);
+                    $("#feedback").addClass("incorrect");
+                }
+            }
+            else {
+                $("#question").text(current_question.problem);
+                var choices = current_question.choices.split("/");
+                $("#choices").empty();
+                n = choices.length;
+                for (var i = 0; i < n; i++) {
+                    // re arrange choice for each question
+                    var random = Math.floor(Math.random() * choices.length);
+                    $("#choices").append("<button>" + choices[random] + "</button>");
+                    choices.splice(random, 1); // remove choice that already append to button
+
+                }
+            }
+            $("#questionIndex").text(questionIndex + 1);
+        }
+
+
+
+        function submitquestion() {
+            var selected = $("button").filter(".selected").text();
+            random_question[questionIndex].select = selected;
+            // check if answer of question is array because some question have multiple answer
+            if (Array.isArray(current_question.answer)) {
+                var correct = false;
+                var i = 0;
+                while (i < current_question.answer.length && !correct) {
+                    if (selected === current_question.answer[i]) {
+                        console.log(current_question.answer[i]);
+                        console.log(selected);
+                        correct = true;
+                        console.log(correct);
+                    }
+                    i++;
+                }
+                if (correct) {
+                    if (random_question[questionIndex].state === false) {
+                        random_question[questionIndex].state = true;
+                        score++;
+                    }
+                    $("#score").text(" " + "Score: " + score + "/" + random_question.length);
+                    $("#feedback").addClass("correct");
+                    $("#feedback").text("Correct!: " + " " + current_question.answer);
+                } else {
+                    random_question[questionIndex].state = true;
+                    $("#feedback").text("Incorrect!, Correct Ans: " + current_question.answer);
+                    $("#feedback").addClass("incorrect");
+                }
+            } else {
+
+                if (selected === current_question.answer) {
+                    if (random_question[questionIndex].state === false) {
+                        random_question[questionIndex].state = true;
+                        score++;
+                    }
+                    $("#score").text(" " + "Score: " + score + "/" + random_question.length);
+                    $("#feedback").addClass("correct");
+                    $("#feedback").text("Correct! : " + " " + current_question.answer);
+                } else {
+                    random_question[questionIndex].state = true;
+                    $("#feedback").text("Incorrect!, Correct Ans: " + current_question.answer);
+                    $("#feedback").addClass("incorrect");
+                }
+            }
+        }
+
+
+        $("#choices").on("click", "button", function () {
+            $(this).addClass("selected").siblings().removeClass("selected");
+        });
+
+        $("#submit-btn").click(function () {
+            submitquestion();
+        });
+
+        function showsubmission(random_question) {
+            var table = document.querySelector("table");
+            table.innerHTML = "";
+            for (var i = 0; i < random_question.length; i++) {
+                if (random_question[i].state === true && random_question[i].select !== random_question[i].answer) {
+                    var row = table.insertRow();
+                    var cell1 = row.insertCell(0);
+                    var cell2 = row.insertCell(1);
+                    var cell3 = row.insertCell(2);
+                    cell1.innerHTML = random_question[i].problem;
+                    cell2.innerHTML = random_question[i].answer;
+                    cell3.innerHTML = random_question[i].select;
+                }
+            }
+        }
+
+        check();
+        showquestion();
+    });
+
+</script>
+
+<body>
+    <div class="row">
+        <!-- create 3 checkboxs to choose the question array-->
+        <div class="checkbox-container">
+            <input type="checkbox" id="quiz1" name="quiz1" value="quiz1">
+            <label for="quiz1">Chromosome</label>
+            <input type="checkbox" id="quiz2" name="quiz2" value="quiz2">
+            <label for="quiz2">Central Dogma</label>
+            <input type="checkbox" id="quiz3" name="quiz3" value="quiz3">
+            <label for="quiz3">Gene Expression</label>
+            <input type="checkbox" id="quiz4" name="quiz4" value="quiz4">
+            <label for="quiz4">Pattern of Inheritance</label>
+            <!-- <input type="checkbox" id="quiz5" name="quiz5" value="quiz5">
+            <label for="quiz5">Biological membrane</label>
+            <input type="checkbox" id="quiz6" name="quiz6" value="quiz6">
+            <label for="quiz6">Nucleotide</label>
+            <input type="checkbox" id="quiz7" name="quiz7" value="quiz7">
+            <label for="quiz7">Enzyme</label>
+            <input type="checkbox" id="quiz8" name="quiz8" value="quiz8">
+            <label for="quiz8">Hormone & Metabolism</label> -->
+
+            <!-- comment small text to show the reference -->
+            <div class="small">หมายเหตุ : เลือกได้ทีละชุด หรือ ถ้าไม่เลือกเลยจะสุ่มจากทุกชุด</div>
+        </div>
+        <div id="quiz-container" class="center-column">
+            <!-- show questionindex -->
+            <h1>Random Quiz ตอนนี้อยู่ข้อ <span id="questionIndex"></span><span id="score"></span>
+            </h1>
+            <p id="question"></p>
+            <div id="choices"></div>
+            <button id="submit-btn">Submit Answer</button>
+            <p id="feedback" onclick="wow"></p>
+            <div class="row">
+                <button id="prev-question">Previous Question</button>
+                <button id="next-question">Next Question</button>
+            </div>
+            <!-- หมายเหตุ -->
+            <!-- <div class="small">ref. mdkkudatabase</div> -->
+        </div>
+        <!-- create table to show the submission -->
+        <table>
+            <tr>
+                <th>Question</th>
+                <th>Correct Answer</th>
+                <th>Your Answer</th>
+            </tr>
+        </table>
+    </div>
+</body>
+
+</html>
